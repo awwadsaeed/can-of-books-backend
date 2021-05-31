@@ -48,7 +48,7 @@ function booksModelSeeding() {
 
 function userModelSeeding() {
     const saeed = new userModel({
-        email: 'awwadsaeed450@gmail.com',
+        email: 'saeedawwad450@gmail.com',
         books: [{
             name: 'shingeki no kyojin',
             description: 'japanese fantasy anime with some weird giants',
@@ -67,25 +67,25 @@ function userModelSeeding() {
 // userModelSeeding();
 
 app.get('/', homeHandler);
-app.get('/books',booksHandler);
-function booksHandler(req,res){
-let userEmail = req.query.email;
+app.get('/books', booksHandler);
+function booksHandler(req, res) {
+    let userEmail = req.query.email;
 
-userModel.find({email:userEmail},function(err,userData){
-    if(err){
-        console.log('psyc, that did not work')
-    }else{
-        // console.log(userData);
-        // console.log(userData[0]);
-        console.log(userData[0].books);
-        res.send(userData[0].books);
-    }
-})
+    userModel.find({ email: userEmail }, function (err, userData) {
+        if (err) {
+            console.log('psyc, that did not work')
+        } else {
+            // console.log(userData);
+            // console.log(userData[0]);
+            console.log(userData[0].books);
+            res.send(userData[0].books);
+        }
+    })
 }
 function homeHandler(req, res) {
 
     res.send('working');
-    
+
 }
 app.listen(PORT, () => {
     console.log(PORT);
