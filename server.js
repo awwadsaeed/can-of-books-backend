@@ -4,8 +4,10 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const mongoose = require('mongoose');
+const { response } = require('express');
 
 const app = express();
+app.use(express.json());
 app.use(cors());
 const PORT = process.env.PORT;
 
@@ -65,9 +67,10 @@ function userModelSeeding() {
 }
 // booksModelSeeding();
 // userModelSeeding();
-
+app.post('/addBooks', addBooksHandler);
 app.get('/', homeHandler);
 app.get('/books', booksHandler);
+app.delete('/deleteBook/:index',deleteBookHandler);
 function booksHandler(req, res) {
     let userEmail = req.query.email;
 
@@ -77,15 +80,58 @@ function booksHandler(req, res) {
         } else {
             // console.log(userData);
             // console.log(userData[0]);
-            console.log(userData[0].books);
+            // console.log(userData[0].books);
             res.send(userData[0].books);
         }
     })
 }
+function addBooksHandler(req, res) {
+    const { bookName, description, imageUrl, email } = req.body;
+    // console.log(bookName);
+    // console.log(description);
+    // console.log(imageUrl);
+    // console.log(email);
+    userModel.find({ email: email }, (error, userData) => {
+        if (error) {
+            console.log('that just happened');
+        } else {
+            console.log(userData[0].books);
+            userData[0].books.push({
+                name:bookName,
+                description:description,
+                image:imageUrl,
+            })
+           userData[0].save();
+           res.send(userData[0].books);
+        }
+    })
+}
+
+
+function deleteBookHandler(req,res){
+    const {email} = req.query;
+    const index = Number(req.params.index);
+    userModel.find({email:email},(error,userData)=>{
+    if(error){res.send('this just happened')}
+    else{
+        const newBookArr = userData[0].books.filter((book,idx)=>{
+            if(idx != index){
+             return book;
+            }
+        })
+
+        userData[0].books=newBookArr;
+        userData[0].save();
+        res.send(userData[0].books);
+    }
+    })
+}
+
+
+
 function homeHandler(req, res) {
 
     res.send('working');
-
 }
 app.listen(PORT, () => {
     console.log(PORT);
