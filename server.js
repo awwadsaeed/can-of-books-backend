@@ -66,7 +66,7 @@ function userModelSeeding() {
     // console.log(saeed);
 }
 // booksModelSeeding();
-userModelSeeding();
+// userModelSeeding();
 app.post('/addBooks', addBooksHandler);
 app.get('/', homeHandler);
 app.get('/books', booksHandler);
