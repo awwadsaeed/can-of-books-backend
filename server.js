@@ -78,19 +78,14 @@ function booksHandler(req, res) {
         if (err) {
             console.log('psyc, that did not work')
         } else {
-            // console.log(userData);
-            // console.log(userData[0]);
-            // console.log(userData[0].books);
+
             res.send(userData[0].books);
         }
     })
 }
 function addBooksHandler(req, res) {
     const { bookName, description, imageUrl, email } = req.body;
-    // console.log(bookName);
-    // console.log(description);
-    // console.log(imageUrl);
-    // console.log(email);
+  
     userModel.find({ email: email }, (error, userData) => {
         if (error) {
             console.log('that just happened');
