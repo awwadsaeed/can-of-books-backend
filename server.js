@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(cors());
 const PORT = process.env.PORT;
 
-mongoose.connect('mongodb://localhost:27017/books', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(`${process.env.MONGODB_URI}`, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const bookSchema = new mongoose.Schema({
     name: String,
@@ -70,13 +70,14 @@ function userModelSeeding() {
 app.post('/addBooks', addBooksHandler);
 app.get('/', homeHandler);
 app.get('/books', booksHandler);
-app.delete('/deleteBook/:index',deleteBookHandler);
+app.delete('/deleteBook/:index', deleteBookHandler);
+app.put('/updateBook/:index', updateBookHandler);
 function booksHandler(req, res) {
     let userEmail = req.query.email;
 
     userModel.find({ email: userEmail }, function (err, userData) {
         if (err) {
-            console.log('psyc, that did not work')
+            console.log('get, that did not work')
         } else {
 
             res.send(userData[0].books);
@@ -88,38 +89,58 @@ function addBooksHandler(req, res) {
   
     userModel.find({ email: email }, (error, userData) => {
         if (error) {
-            console.log('that just happened');
+            console.log('add, that just happened');
         } else {
-            console.log(userData[0].books);
+            // console.log(userData[0].books);
             userData[0].books.push({
-                name:bookName,
-                description:description,
-                image:imageUrl,
+                name: bookName,
+                description: description,
+                image: imageUrl,
             })
-           userData[0].save();
-           res.send(userData[0].books);
+            userData[0].save();
+            res.send(userData[0].books);
         }
     })
 }
 
 
-function deleteBookHandler(req,res){
-    const {email} = req.query;
+function deleteBookHandler(req, res) {
+    const { email } = req.query;
     const index = Number(req.params.index);
-    userModel.find({email:email},(error,userData)=>{
-    if(error){res.send('this just happened')}
-    else{
-        const newBookArr = userData[0].books.filter((book,idx)=>{
-            if(idx != index){
-             return book;
-            }
-        })
+    userModel.find({ email: email }, (error, userData) => {
+        if (error) { res.send('delete ,this just happened') }
+        else {
+            const newBookArr = userData[0].books.filter((book, idx) => {
+                if (idx != index) {
+                    return book;
+                }
+            })
 
-        userData[0].books=newBookArr;
-        userData[0].save();
-        res.send(userData[0].books);
-    }
+            userData[0].books = newBookArr;
+            userData[0].save();
+            res.send(userData[0].books);
+        }
     })
+}
+
+function updateBookHandler(req, res) {
+    console.log(req.body);
+    const { bookName, description, imageUrl,email } = req.body;
+    const index = Number(req.params.index);
+    userModel.findOne({ email: email }, (err, userData) => {
+        if (err) {
+            console.log('that just happened')
+        } else {
+            userData.books.splice(index, 1, {
+                name: bookName,
+                description: description,
+                image: imageUrl
+            })
+            userData.save();
+            res.send(userData.books);
+        }
+    })
+    console.log(index);
 }
 
 
