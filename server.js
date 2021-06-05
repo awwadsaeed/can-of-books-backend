@@ -12,7 +12,7 @@ app.use(cors());
 const PORT = process.env.PORT;
 
 mongoose.connect(`${process.env.MONGODB_URI}`, { useNewUrlParser: true, useUnifiedTopology: true });
-
+//localhost:27017/books
 const bookSchema = new mongoose.Schema({
     name: String,
     description: String,
@@ -72,21 +72,26 @@ app.get('/', homeHandler);
 app.get('/books', booksHandler);
 app.delete('/deleteBook/:index', deleteBookHandler);
 app.put('/updateBook/:index', updateBookHandler);
+
+
 function booksHandler(req, res) {
     let userEmail = req.query.email;
+
 
     userModel.find({ email: userEmail }, function (err, userData) {
         if (err) {
             console.log('get, that did not work')
         } else {
-
+            // console.log(userData[0].email);
             res.send(userData[0].books);
         }
     })
+
+
 }
 function addBooksHandler(req, res) {
     const { bookName, description, imageUrl, email } = req.body;
-  
+
     userModel.find({ email: email }, (error, userData) => {
         if (error) {
             console.log('add, that just happened');
@@ -125,7 +130,7 @@ function deleteBookHandler(req, res) {
 
 function updateBookHandler(req, res) {
     console.log(req.body);
-    const { bookName, description, imageUrl,email } = req.body;
+    const { bookName, description, imageUrl, email } = req.body;
     const index = Number(req.params.index);
     userModel.findOne({ email: email }, (err, userData) => {
         if (err) {
